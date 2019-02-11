@@ -1,0 +1,41 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Feb 11 11:33:51 2019
+
+@author: dell
+"""
+
+import threading
+from time import time
+
+class MyThread(threading.Thread):
+    def __init__(self,func,args=()):
+        super(MyThread,self).__init__()
+        self.func = func
+        self.args = args
+    def run(self):
+        print(self.func.__name__,'start ',time())
+        self.result = self.func(*self.args)
+        print(self.func.__name__,'end ',time())
+    def get_result(self):
+        threading.Thread.join(self) # 等待线程执行完毕
+        try:
+            return self.result
+        except Exception:
+            return None
+        
+def myfun(num):
+    from time import sleep
+    import random
+    sleep(random.randint(1,5))
+    return num**2
+ts,rets=[],[]
+for i in range(3):
+    t = MyThread(myfun,args=(i,))
+    ts.append(t)
+for t in ts:
+    t.start()
+for t in ts:
+    ret = t.get_result()
+    rets.append(ret)       
+print(rets)
